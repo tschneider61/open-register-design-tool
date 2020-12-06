@@ -1,0 +1,240 @@
+regfile node {
+
+		default reset = 0;
+
+		reg {
+        regwidth=64;
+        desc = "System designation and Absolute Node Number of this node - value is set at system boot time and should not be altered by software";
+		field {sw=rw; hw=r;} condor_system[16:16];
+		field {sw=rw; hw=r;} absolute_node_number[15:0];
+		} reg_type_node;
+
+		reg {
+        regwidth=64;
+        desc = "Log2 of Number of Nodes in the system.  This value is read by the Gossamer Cores using the LSR instruction";
+		field {sw=rw; hw=r;} log2_num_nodes[4:0];
+		} reg_num_nodes;
+
+		reg {
+        regwidth=64;
+        desc ="MSP Size - this value specifies the amount of memory (in GB) installed in each msp in the node. Note - ALL msps in the node must have the same amount of memory.  This value is read by the Gossamer Cores using the LSR instruction. 0=4GB, 1=8GB, 2=16GB, 3=32GB (Number of address bits: 0=32 bits, 1=33 bits, 2=34 bits, 3=35 bits)";
+		field {sw=rw; hw=r;} msp_size[1:0];
+		} reg_msp_size;
+
+		reg {
+        regwidth=64;
+        desc = "Number of clusters and msps in this node";
+		field {sw=r; hw=w;} num_clusters[35:32];
+		field {sw=r; hw=w;} num_msps[3:0];
+		} reg_clst_msp;
+
+		reg {
+        regwidth=64;
+        desc = "Number of Gossamer Cores per cluster in this node";
+		field {sw=r; hw=w;} cores_per_cluster[3:0];
+		} reg_cores_cluster;
+
+		reg {
+        regwidth=64;
+        desc = "Enable PCIe reads";
+		field {sw=rw; hw=r;} avalon_timeout_bar2[47:32]=16'hffff;
+		field {sw=rw; hw=r;} avalon_timeout_bar0[31:16]=16'hffff;
+		field {sw=rw; hw=r;} avalon_monitor_bypass2[9:9]=1;
+		field {sw=rw; hw=r;} avalon_monitor_bypass0[8:8]=1;
+		field {sw=rw; hw=r;} enable_pcie_read[0:0]=1;
+		} reg_avl_mon;
+
+		reg {
+        desc = "Debug register status: bit 2 - NCR debug registers enabled, bit 1 - MFE debug registers enabled, bit 0";
+		field {sw=r; hw=w;} ncr_debug_enabled[2:2];
+		field {sw=r; hw=w;} mfe_debug_enabled[1:1];
+		} reg_dbg_mon;
+
+		reg {
+        regwidth=64;
+        desc = "64-bit counter that increments on every core clock cycle once out of reset.  Can be set by the Stationary Core at boot time for synchronization amongst nodes.  All counters are expected to be approximately synchronized, but may vary slightly due to network latency.  Value can be read by Gossamer Cores using the LSR instruction. Value can be read by Stationary Core using MMR";
+		field {sw=rw; hw=rw;} real_time_counter [63:0] = 64'hffff_ffff_ffff_ffff;
+		} reg_rt_ctr;
+
+
+		reg {
+        desc = "When this bit is set the physical address bit is ignored and all addresses are handled as physical addresses";
+		field {sw=rw; hw=r;} ignore_phy_addr [0:0];
+		} reg_ign_pa;
+
+		reg {
+        desc = "When this bit is set the local spawn function is disabled";
+		field {sw=rw; hw=r;} disable_local_spawn [0:0];
+		} reg_dis_ls;
+
+		reg {
+        regwidth=64;
+        desc = "Credit tracking - [63] OVERWRITE_CREDITS - if set to 1, the value of ADJUST_CREDITS will overwrite the value of the CREDITS register.  Otherwise, writing a signed value to ADJUST_CREDITS will adjust the number of credits available in the CREDITS register, [15:0] signed CREDITS tracking register.  CREDITS is a Read-only register that is reset to 0 and adjusted by writing a signed number to the ADJUST_CREDITS register";
+		field {singlepulse;} overwrite_credits [63:63];
+		field {sw=rw; hw=rw;} node_credits [15:0];
+		} reg_cdt1;
+
+		reg {
+        regwidth=64;
+        desc = "[63] TRACK_MIGRATION - if set, indicates that migrations should be tracked with the CREDITS/THREADS, [15:0] THREADS - read only register containing the number of threads residing on the node";
+		field {sw=rw; hw=r;} track_migration[63:63]=1;
+		field {sw=rw; hw=r;} enable_credits[32:32]=1;
+		field {sw=r; hw=w;} node_threads [15:0];
+		} reg_cdt2;
+
+		reg {
+        desc = "Static HI/LO controls for DSP sub and negate inputs which cannot be strapped -- SW SHOULD NOT WR THIS REGISTER";
+		field {sw=rw; hw=r;} dsp_hi[1:1]=1;
+		field {sw=rw; hw=r;} dsp_lo[0:0];
+		} reg_hilo;
+
+		reg {
+        regwidth=64;
+        desc = "Soft Reset controls";
+		field {sw=rw; hw=r;} reset_srio_control[30:30];
+		field {sw=rw; hw=r;} reset_srio[29:24];
+		field {sw=rw; hw=r;} reset_emif[23:16];
+		field {sw=rw; hw=r;} reset_me[8:8];
+		field {sw=rw; hw=r;} reset_msp[7:4];
+		field {sw=rw; hw=r;} reset_cluster[3:0];
+		} reg_rst;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} amm_0_read_rsp [63:32];
+		field {sw=r; hw=w;} amm_0_read_req [31:0];
+		} reg_amm_0;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} amm_1_read_rsp [63:32];
+		field {sw=r; hw=w;} amm_1_read_req [31:0];
+		} reg_amm_1;
+
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} amm_2_read_rsp [63:32];
+		field {sw=r; hw=w;} amm_2_read_req [31:0];
+		} reg_amm_2;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} amm_3_read_rsp [63:32];
+		field {sw=r; hw=w;} amm_3_read_req [31:0];
+		} reg_amm_3;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} amm_4_read_rsp [63:32];
+		field {sw=r; hw=w;} amm_4_read_req [31:0];
+		} reg_amm_4;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} amm_5_read_rsp [63:32];
+		field {sw=r; hw=w;} amm_5_read_req [31:0];
+		} reg_amm_5;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} amm_6_read_rsp [63:32];
+		field {sw=r; hw=w;} amm_6_read_req [31:0];
+		} reg_amm_6;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} amm_7_read_rsp [63:32];
+		field {sw=r; hw=w;} amm_7_read_req [31:0];
+		} reg_amm_7;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} avs_sc_read_rsp [63:32];
+		field {sw=r; hw=w;} avs_sc_read_req [31:0];
+		} reg_avs_sc;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} avs_ndlt_0_read_rsp [63:32];
+		field {sw=r; hw=w;} avs_ndlt_0_read_req [31:0];
+		} reg_ndlt_0;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} avs_ndlt_1_read_rsp [63:32];
+		field {sw=r; hw=w;} avs_ndlt_1_read_req [31:0];
+		} reg_ndlt_1;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} avs_ndlt_2_read_rsp [63:32];
+		field {sw=r; hw=w;} avs_ndlt_2_read_req [31:0];
+		} reg_ndlt_2;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} avs_ndlt_3_read_rsp [63:32];
+		field {sw=r; hw=w;} avs_ndlt_3_read_req [31:0];
+		} reg_ndlt_3;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} avs_ndlt_4_read_rsp [63:32];
+		field {sw=r; hw=w;} avs_ndlt_4_read_req [31:0];
+		} reg_ndlt_4;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} avs_ndlt_5_read_rsp [63:32];
+		field {sw=r; hw=w;} avs_ndlt_5_read_req [31:0];
+		} reg_ndlt_5;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} avs_ndlt_6_read_rsp [63:32];
+		field {sw=r; hw=w;} avs_ndlt_6_read_req [31:0];
+		} reg_ndlt_6;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} avs_ndlt_7_read_rsp [63:32];
+		field {sw=r; hw=w;} avs_ndlt_7_read_req [31:0];
+		} reg_ndlt_7;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} avs_me_regif_read_rsp [63:32];
+		field {sw=r; hw=w;} avs_me_regif_read_req [31:0];
+		} reg_me_reg;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} avs_ncr_regif_read_rsp [63:32];
+		field {sw=r; hw=w;} avs_ncr_regif_read_req [31:0];
+		} reg_ncr_reg;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} all_mem_cal_fail [15:8];
+		field {sw=r; hw=w;} all_mem_cal_success [7:0];
+		} reg_cal_fail;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} max_wait_delay_bar0 [16:0];
+		} reg_bar0;
+
+		reg {
+        regwidth=64;
+		field {sw=r; hw=w;} sc_bar2_write_burst_set [45:40];
+		field {sw=r; hw=w;} sc_bar2_read_burst_set [37:32];
+		field {sw=r; hw=w;} max_wait_delay_bar2 [16:0];
+		} reg_bar2;
+};
+
+
+addrmap  {
+    default accesswidth=64;
+	node node @0x200000;
+} top;	
